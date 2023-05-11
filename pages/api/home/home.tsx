@@ -34,7 +34,6 @@ import { Prompt } from '@/types/prompt';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
-import Promptbar from '@/components/Promptbar';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -279,7 +278,6 @@ const Home = ({
 
     if (window.innerWidth < 640) {
       dispatch({ field: 'showChatbar', value: false });
-      dispatch({ field: 'showPromptbar', value: false });
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
@@ -287,10 +285,10 @@ const Home = ({
       dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
     }
 
-    const showPromptbar = localStorage.getItem('showPromptbar');
-    if (showPromptbar) {
-      dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
-    }
+    // const showPromptbar = localStorage.getItem('showPromptbar');
+    // if (showPromptbar) {
+    //   dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
+    // }
 
     const folders = localStorage.getItem('folders');
     if (folders) {
@@ -386,7 +384,6 @@ const Home = ({
               <Chat stopConversationRef={stopConversationRef} />
             </div>
 
-            <Promptbar />
           </div>
         </main>
       )}
@@ -423,7 +420,6 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'chat',
         'sidebar',
         'markdown',
-        'promptbar',
         'settings',
       ])),
     },

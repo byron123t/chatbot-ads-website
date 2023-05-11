@@ -30,8 +30,13 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  let url = `${OPENAI_API_HOST}/api`;
-  // let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  let url = '';
+  if (`${OPENAI_API_HOST}`.includes('api.openai.com')) {
+    url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  } else {
+    url = `${OPENAI_API_HOST}/api`;
+  }
+  console.log(url);
 
   const res = await fetch(url, {
     headers: {
@@ -106,7 +111,7 @@ export const OpenAIStream = async (
 
       const parser = createParser(onParse);
       for await (const chunk of res.body as any) {
-        console.log(decoder.decode(chunk));
+        // console.log(decoder.decode(chunk));
         parser.feed(decoder.decode(chunk));
       }
     },

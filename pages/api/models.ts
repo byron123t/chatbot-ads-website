@@ -12,8 +12,12 @@ const handler = async (req: Request): Promise<Response> => {
       key: string;
     };
 
-    let url = `${OPENAI_API_HOST}/api`;
-    // let url = `${OPENAI_API_HOST}/v1/models`;
+    let url = ''
+    if (`${OPENAI_API_HOST}`.includes('api.openai.com')) {
+      url = `${OPENAI_API_HOST}/v1/models`;
+    } else {
+      url = `${OPENAI_API_HOST}/api`;
+    }
     
     console.log(url);
 
@@ -49,24 +53,26 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const json = await response.json();
-    // console.log(json.data)
+    let models = '';
 
-    // const models: OpenAIModel[] = json.data
-    //   .map((model: any) => {
-    //     const model_name = (OPENAI_API_TYPE === 'azure') ? model.model : model.id;
-    //     for (const [key, value] of Object.entries(OpenAIModelID)) {
-    //       if (value === model_name) {
-    //         return {
-    //           id: model.id,
-    //           name: OpenAIModels[value].name,
-    //         };
-    //       }
-    //     }
-    //   })
-    //   .filter(Boolean);
-
-    const models = json
-    console.log(models)
+    if (`${OPENAI_API_HOST}`.includes('api.openai.com')) {
+      models = json.data
+        .map((model: any) => {
+          const model_name = (OPENAI_API_TYPE === 'azure') ? model.model : model.id;
+          for (const [key, value] of Object.entries(OpenAIModelID)) {
+            if (value === model_name) {
+              return {
+                id: model.id,
+                name: OpenAIModels[value].name,
+              };
+            }
+          }
+        })
+        .filter(Boolean);
+    } else {
+      models = json;
+      console.log(models);
+    }
 
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {
