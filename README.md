@@ -103,3 +103,47 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 If you have any questions, feel free to reach out to Mckay on [Twitter](https://twitter.com/mckaywrigley).
 
 [GCSE]: https://developers.google.com/custom-search/v1/overview
+
+## Installation
+
+- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+- export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+- nvm install node
+- nvm install-latest-npm
+- wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+- bash Miniconda3-latest-Linux-x86_64.sh
+- source miniconda3/bin/activate
+- conda create -n chatbot-ads python=3.9
+- conda activate chatbot-ads
+- git clone https://github.com/byron123t/chatbot-ads.git
+- cd chatbot-ads
+- pip install -r dependencies/requirements.txt
+- pip install -e .
+- mkdir sensitive
+- scp -i "chabotads.pem" objects.py ec2-user@ec2-3-128-29-68.us-east-2.compute.amazonaws.com:/home/ec2-user/chatbot-ads/sensitive
+- cd website
+- python website.py
+- cd ..
+- git clone https://github.com/byron123t/chatbot-ads-website.git
+- cd chatbot-ads-website
+- npm i
+- npm run build
+- npm run start
+- pip install ansible
+- ansible-galaxy install nginxinc.nginx
+- ansible-playbook playbook.yml
+- sudo nano /etc/nginx/conf.d/default.conf
+- sudo service nginx restart
+
+```
+server {
+  listen 80;
+
+  server_name 123.456.789.10 example.com;
+
+
+  location / {
+    proxy_pass http://localhost:3000;
+  }
+}
+```

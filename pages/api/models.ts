@@ -8,12 +8,10 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { key, sessionKey } = (await req.json()) as {
+    const { key } = (await req.json()) as {
       key: string;
-      sessionKey: string;
     };
     console.log(key);
-    console.log(sessionKey);
 
     let url = ''
     if (`${OPENAI_API_HOST}`.includes('api.openai.com')) {

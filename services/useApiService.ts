@@ -28,7 +28,7 @@ const useApiService = () => {
   const getModels = useCallback(
     (params: GetModelsRequestProps, signal?: AbortSignal) => {
       return fetchService.post<GetModelsRequestProps>(`/api/models`, {
-        body: { key: params.key, sessionKey: localStorage.getItem('sessionKey') },
+        body: { key: params.key },
         headers: {
           'Content-Type': 'application/json',
         },
