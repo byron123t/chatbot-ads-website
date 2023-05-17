@@ -24,11 +24,9 @@ export class OpenAIError extends Error {
 }
 
 export const OpenAIStream = async (
-  model: OpenAIModel,
-  systemPrompt: string,
-  temperature : number,
   key: string,
-  messages: Message[],
+  message: Message,
+  id: string,
 ) => {
   let url = '';
   if (`${OPENAI_API_HOST}`.includes('api.openai.com')) {
@@ -53,17 +51,9 @@ export const OpenAIStream = async (
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        ...messages,
-      ],
-      max_tokens: 1000,
-      temperature: temperature,
-      stream: true,
+      message: message,
+      session_key: key,
+      conversation_id: id,
     }),
   });
 

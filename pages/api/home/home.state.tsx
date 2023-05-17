@@ -7,6 +7,7 @@ import { Prompt } from '@/types/prompt';
 
 export interface HomeInitialState {
   apiKey: string;
+  sessionKey: string;
   pluginKeys: PluginKey[];
   loading: boolean;
   lightMode: 'light' | 'dark';
@@ -30,7 +31,8 @@ export interface HomeInitialState {
 }
 
 export const initialState: HomeInitialState = {
-  apiKey: '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',
+  apiKey: '',
+  sessionKey: crypto.randomUUID(),
   loading: false,
   pluginKeys: [],
   lightMode: 'dark',
@@ -49,6 +51,6 @@ export const initialState: HomeInitialState = {
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
-  serverSideApiKeyIsSet: true,
+  serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: true,
 };

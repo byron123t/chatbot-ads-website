@@ -63,6 +63,7 @@ const Home = ({
   const {
     state: {
       apiKey,
+      sessionKey,
       lightMode,
       folders,
       conversations,
@@ -258,6 +259,7 @@ const Home = ({
       });
     }
 
+    localStorage.setItem('sessionKey', sessionKey);
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
@@ -358,7 +360,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>Chatbot XYZ</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"

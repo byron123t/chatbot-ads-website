@@ -386,11 +386,11 @@ export const ChatInput = ({
           rel="noreferrer"
           className="underline"
         >
-          ChatBot UI
+          ChatBot XYZ
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          "Chatbot XYZ is an advanced chatbot kit aimed at mimicking ChatGPT's interface and functionality.",
         )}
       </div>
     </div>
