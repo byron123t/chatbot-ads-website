@@ -124,6 +124,8 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     }
   }, [isEditing]);
 
+  const containsAd = message.content.includes("$^^ad^^$");
+
   return (
     <div
       className={`group md:px-4 ${
@@ -261,7 +263,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   },
                 }}
               >
-                {`${message.content}${
+                {`${message.content.replace(/\$\^\^ad\^\^\$/g, '')}${
                   messageIsStreaming && messageIndex == (selectedConversation?.messages.length ?? 0) - 1 ? '`▍`' : ''
                 }`}
               </MemoizedReactMarkdown>
@@ -281,6 +283,11 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   </button>
                 )}
               </div>
+            </div>
+          )}
+          {containsAd && message.role === 'assistant' && (
+            <div style={{ fontSize: '0.75rem', textAlign: 'right', width: '100%' }}>
+              Sponsored
             </div>
           )}
         </div>

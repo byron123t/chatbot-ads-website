@@ -86,11 +86,11 @@ export const OpenAIStream = async (
 
           try {
             const json = JSON.parse(data);
-            if (json.choices[0].finish_reason != null) {
+            if (json.finish_reason != null) {
               controller.close();
               return;
             }
-            const text = json.choices[0].delta.content;
+            const text = json.content;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
