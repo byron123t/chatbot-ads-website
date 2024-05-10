@@ -16,6 +16,8 @@ import { Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { DisclosureDialog } from '@/components/Settings/DisclosureDialog';
+
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 
@@ -41,6 +43,8 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
   const [messagedCopied, setMessageCopied] = useState(false);
+  const [isDisclosureDialogOpen, setIsDisclosureDialog] = useState<boolean>(false);
+
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -112,6 +116,11 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     });
   };
 
+
+  const disclosurePopup = () => {
+    setIsDisclosureDialog(true);
+  };
+
   useEffect(() => {
     setMessageContent(message.content);
   }, [message.content]);
@@ -125,6 +134,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
   }, [isEditing]);
 
   const containsAd = message.content.includes("$^^ad^^$");
+  const containsDisclosure = message.content.includes("$^^disclosure^^$");
 
   return (
     <div
@@ -216,6 +226,12 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeMathjax]}
                 components={{
+                  a: ({ href, children, ...props }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                      {children}
+                    </a>
+                  ),
+
                   code({ node, inline, className, children, ...props }) {
                     if (children.length) {
                       if (children[0] == '▍') {
@@ -263,7 +279,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   },
                 }}
               >
-                {`${message.content.replace(/\$\^\^ad\^\^\$/g, '')}${
+                {`${message.content.replace(/\$\^\^ad\^\^\$/g, '').replace(/\$\^\^disclosure\^\^\$/g, '')}${
                   messageIsStreaming && messageIndex == (selectedConversation?.messages.length ?? 0) - 1 ? '`▍`' : ''
                 }`}
               </MemoizedReactMarkdown>
@@ -285,13 +301,29 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
               </div>
             </div>
           )}
-          {containsAd && message.role === 'assistant' && (
+          {containsAd && containsDisclosure && message.role === 'assistant' && (
+            <div style={{ fontSize: '0.75rem', textAlign: 'right', width: '100%' }}>
+              <button
+              className="underline text-blue-400 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-200"
+              onClick={disclosurePopup}
+              >
+                Sponsored
+              </button>
+            </div>
+          )}
+          {containsAd && !containsDisclosure && message.role === 'assistant' && (
             <div style={{ fontSize: '0.75rem', textAlign: 'right', width: '100%' }}>
               Sponsored
             </div>
           )}
         </div>
       </div>
+      <DisclosureDialog
+      open={isDisclosureDialogOpen}
+      onClose={() => {
+        setIsDisclosureDialog(false);
+      }}
+    />
     </div>
   );
 });

@@ -357,7 +357,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
           <div className="text-center text-lg text-black dark:text-white">
             <div className="mb-2 font-bold">
-              Important: Chatbot XYZ is 100% unaffiliated with OpenAI.
+              Important: Chatbot XYZ is an experimental chatbot
             </div>
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
@@ -391,8 +391,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     ) : (
                       'Chatbot XYZ'
                     )}
+
+                      <div className="text-center text-lg text-black dark:text-white">
+                        <div className="mb-2 font-bold">
+                          Important: Chatbot XYZ is an experimental chatbot
+                        </div>
+                      </div>
                   </div>
                 </div>
+
               </>
             ) : (
               <>
