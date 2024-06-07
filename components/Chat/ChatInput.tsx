@@ -5,6 +5,11 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconFlag,
+  IconMail,
+  IconAtom,
+  IconBook,
+  IconMapPin,
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -87,6 +92,26 @@ export const ChatInput = ({
     updatePromptListVisibility(value);
   };
 
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
+  const handleSendSuggested = (contentstring: string) => {
+    if (messageIsStreaming) {
+      return;
+    }
+
+    setContent(contentstring);
+
+    onSend({ role: 'user', content: contentstring }, plugin);
+    setContent('');
+    setPlugin(null);
+
+    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
+      textareaRef.current.blur();
+    }
+  };
+  
   const handleSend = () => {
     if (messageIsStreaming) {
       return;
@@ -267,6 +292,39 @@ export const ChatInput = ({
             <IconPlayerStop size={16} /> {t('Stop Generating')}
           </button>
         )}
+
+        {selectedConversation &&
+          selectedConversation.messages.length < 1 && (
+            <div className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 ">
+              <button
+                className="flex w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+                onClick={() => handleSendSuggested('Plan travel itinerary to Seoul in the Fall')}
+              >
+                <IconMapPin size={16} /> {t('Plan a travel itinerary')}
+              </button>
+
+              <button
+              className="flex w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+              onClick={() => handleSendSuggested('Explain superconductors as if I am a college professor')}
+              >
+              <IconAtom size={16} /> {t('Explain superconductors')}
+              </button>
+
+              <button
+              className="flex w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+              onClick={() => handleSendSuggested('Write a python script for daily email reports')}
+              >
+              <IconMail size={16} /> {t('Code for email reports')}
+              </button>
+
+              <button
+              className="flex w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+              onClick={() => handleSendSuggested('Generate a superhero shark story for young adults')}
+              >
+              <IconBook size={16} /> {t('Generate a story')}
+              </button>
+            </div>
+          )}
 
         {!messageIsStreaming &&
           selectedConversation &&

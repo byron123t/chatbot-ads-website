@@ -23,6 +23,37 @@ export class OpenAIError extends Error {
   }
 }
 
+const fetchWithHandling = async (url: string, key: string, body: any) => {
+  const res = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(OPENAI_API_TYPE === 'openai' && {
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+      }),
+    },
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  if (res.status !== 200) {
+    const result = await res.json();
+    if (result.error) {
+      throw new OpenAIError(
+        result.error.message,
+        result.error.type,
+        result.error.param,
+        result.error.code,
+      );
+    } else {
+      throw new Error(
+        `OpenAI API returned an error: ${result?.value || res.statusText}`,
+      );
+    }
+  }
+
+  return res;
+};
+
 export const OpenAIStream = async (
   key: string,
   message: Message,
@@ -36,25 +67,10 @@ export const OpenAIStream = async (
   }
   console.log(url);
 
-  const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
-      }),
-      ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
-      }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      message: message,
-      session_key: key,
-      conversation_id: id,
-    }),
+  const res = await fetchWithHandling(url, key, {
+    message: message,
+    session_key: key,
+    conversation_id: id,
   });
 
   const encoder = new TextEncoder();
@@ -107,4 +123,33 @@ export const OpenAIStream = async (
     },
   });
   return stream;
+};
+
+export const handleDisclosure = async (key: string, id: string, message: string, mode: string) => {
+  const url = `${OPENAI_API_HOST}/disclosure`;
+
+  const res = await fetchWithHandling(url, key, {
+    message: message,
+    session_key: key,
+    conversation_id: id,
+    mode: mode
+  });
+
+  const data = await res.json();
+  console.log('Disclosure response:', data);
+  return data;
+};
+
+export const handleLinkClick = async (key: string, id: string, message: string) => {
+  const url = `${OPENAI_API_HOST}/linkclick`;
+
+  const res = await fetchWithHandling(url, key, {
+    message: message,
+    session_key: key,
+    conversation_id: id
+  });
+
+  const data = await res.json();
+  console.log('Link Click response:', data);
+  return data;
 };

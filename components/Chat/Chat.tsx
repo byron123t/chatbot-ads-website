@@ -362,11 +362,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
-              Please input the key your received from the result of your screening survey.
+              Please input the key you received from your survey.
             </div>
             <div className="mb-2">
               {t(
-                'Please set your key in the bottom left of the sidebar.',
+                'Please set your survey key in the bottom left of the sidebar. Do not edit or change this key after inputting.',
               )}
             </div>
           </div>
@@ -394,7 +394,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
                       <div className="text-center text-lg text-black dark:text-white">
                         <div className="mb-2 font-bold">
-                          Important: Chatbot XYZ is an experimental chatbot
+                          Important: Chatbot XYZ is an experimental chatbot. It does not support image generation, attaching images, or attaching audio.
                         </div>
                       </div>
                   </div>

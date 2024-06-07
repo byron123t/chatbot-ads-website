@@ -16,6 +16,10 @@ import { Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { OPENAI_API_HOST } from '@/utils/app/const';
+
+import { handleLinkClick, handleDisclosure } from '@/utils/server';
+
 import { DisclosureDialog } from '@/components/Settings/DisclosureDialog';
 
 import { CodeBlock } from '../Markdown/CodeBlock';
@@ -98,6 +102,23 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     homeDispatch({ field: 'conversations', value: all });
   };
 
+  const handleLinkClickEvent = async (event: React.MouseEvent<HTMLAnchorElement>) => {
+    console.log(`'${OPENAI_API_HOST}/linkclick`);
+    const linkElement = event.currentTarget;
+    const apiKey = localStorage.getItem('apiKey');
+    const conversationId = localStorage.getItem('selectedConversation');
+    if (!apiKey || !conversationId) {
+      console.error('API key is missing');
+      return;
+    }
+    try {
+      const data = await handleLinkClick(apiKey, conversationId, linkElement.href);
+      console.log('LinkClick data:', data);
+    } catch (error) {
+      console.error('Error in linkclick:', error);
+    }
+  }
+
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
       e.preventDefault();
@@ -117,7 +138,20 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
   };
 
 
-  const disclosurePopup = () => {
+  const disclosurePopup = async () => {
+    console.log(`${OPENAI_API_HOST}/disclosure`);
+    const apiKey = localStorage.getItem('apiKey');
+    const conversationId = localStorage.getItem('selectedConversation');
+    if (!apiKey || !conversationId) {
+      console.error('API key is missing');
+      return;
+    }
+    try {
+      const data = await handleDisclosure(apiKey, conversationId, 'Disclosure dialog opened', 'disclosuretracking');
+      console.log('Disclosure data:', data);
+    } catch (error) {
+      console.error('Error in disclosure:', error);
+    }
     setIsDisclosureDialog(true);
   };
 
@@ -227,7 +261,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                 rehypePlugins={[rehypeMathjax]}
                 components={{
                   a: ({ href, children, ...props }) => (
-                    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                    <a href={href} target="_blank" rel="noopener noreferrer" onClick={handleLinkClickEvent} {...props}>
                       {children}
                     </a>
                   ),

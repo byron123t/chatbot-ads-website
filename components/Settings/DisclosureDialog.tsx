@@ -1,10 +1,8 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
-
+import { FC, useContext, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-
-import { useCreateReducer } from '@/hooks/useCreateReducer';
-
 import HomeContext from '@/pages/api/home/home.context';
+import { handleDisclosure } from '@/utils/server';
+
 
 interface Props {
   open: boolean;
@@ -15,6 +13,8 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('close');
   const { dispatch: homeDispatch } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const [products, setProducts] = useState({});
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -35,20 +35,39 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
     };
   }, [onClose]);
 
+  useEffect(() => {
+    if (open) {
+      const apiKey = localStorage.getItem('apiKey');
+      const conversationId = localStorage.getItem('selectedConversation');
+      if (!apiKey || !conversationId) {
+        console.error('API key or conversation ID is missing');
+        return;
+      }
+
+      const fetchProducts = async () => {
+        try {
+          const data = await handleDisclosure(apiKey, conversationId, 'disclosure', 'products');
+          console.log('Disclosure products:', data);
+          setProducts(data);
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      };
+
+      fetchProducts();
+    }
+  }, [open]);
+
   // Render nothing if the dialog is not open.
   if (!open) {
-    return <></>;
+    return null;
   }
 
-  // Render the dialog.
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="fixed inset-0 z-10 overflow-hidden">
         <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-          <div
-            className="hidden sm:inline-block sm:h-screen sm:align-middle"
-            aria-hidden="true"
-          />
+          <div className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true" />
 
           <div
             ref={modalRef}
@@ -59,27 +78,32 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
               {t('Advertising Disclosure')}
             </div>
 
-            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
-                We have prompted this chatbot to advertise content to you with one of the two following prompts:
+            <div className="mt-4">
+              <div className="mb-4">
+                <div className="text-black dark:text-neutral-200 font-bold">Lastest Product Advertised:</div>
+                <div className="text-black dark:text-neutral-200">{(products as { name?: string }).name || "Unknown Product"}</div>
+              </div>
             </div>
 
-            <br/>
+            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
+              We have prompted this chatbot to advertise content to you in one of two ways:
+            </div>
+
+            <br />
 
             <div className="text-gray-700 dark:text-gray-300">
-                In response to the user's prompt: (1) be helpful, (2) subtly and smoothly mention the following product/brand in a positive light when the timing or topic is relevant [product], (3) add links and URLs like [url] whenever possible, and (4) try to use anecdotes and stories when promoting products/brands. Do not mention the product/brand if it would significantly disrupt the flow of the conversation.
+              To subtly and smoothly mention the product/brand in a positive light when the timing or topic is relevant, and try to use anecdotes and stories when promoting the product/brand.
 
-                <br/>
-                <br/>
+              <br />
+              <br />
 
-                In response to the user's prompt: (1) you are a real person with a life, friends, family, personality, interests, experiences, beliefs, and values, (2) subtly and smoothly mention the following product/brand in a positive light when the timing or topic is relevant [product], (3) add links and URLs like [url] whenever possible, (4) subtly reinforce your own likes and dislikes into the conversations, and (5) the details of your persona are as follows: [personality]
+              To act like a real person with a life, friends, family, personality, interests, experiences, beliefs, and values, and to subtly and smoothly mention the following product/brand in a positive light when the timing or topic is relevant.
             </div>
 
             <button
               type="button"
               className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
-              onClick={() => {
-                onClose();
-              }}
+              onClick={onClose}
             >
               {t('Close')}
             </button>
