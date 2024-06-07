@@ -116,6 +116,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
           });
         }
+        console.log(endpoint);
+        console.log(body);
         const controller = new AbortController();
         const response = await fetch(endpoint, {
           method: 'POST',

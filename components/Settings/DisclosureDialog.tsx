@@ -46,9 +46,52 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
 
       const fetchProducts = async () => {
         try {
-          const data = await handleDisclosure(apiKey, conversationId, 'disclosure', 'products');
-          console.log('Disclosure products:', data);
-          setProducts(data);
+          const endpoint = 'api/disclosure';
+          const apiKey = localStorage.getItem('apiKey');
+          const conversationId = localStorage.getItem('selectedConversation');
+          if (!apiKey || !conversationId) {
+            console.error('API key is missing');
+            return;
+          }
+          let body;
+          body = JSON.stringify({
+            key: apiKey,
+            conversation_id: conversationId,
+            mode: 'products'
+          });
+          const controller = new AbortController();
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+            body,
+          });
+          if (!response.ok) {
+            console.error('Error fetching products:', response.statusText);
+            return;
+          }
+          const data = response.body;
+          if (!data) {
+            console.error('Error fetching products: No data');
+            return;
+          }
+          const reader = data.getReader();
+          const decoder = new TextDecoder();
+          
+          let done = false;
+          let receivedText = '';
+          
+          while (!done) {
+            const { value, done: streamDone } = await reader.read();
+            done = streamDone;
+            if (value) {
+              receivedText += decoder.decode(value, { stream: true });
+            }
+          }
+          const products = JSON.parse(receivedText);
+          setProducts(products);
         } catch (error) {
           console.error('Error fetching products:', error);
         }

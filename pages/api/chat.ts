@@ -16,7 +16,6 @@ export const config = {
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { id, model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
-    console.log('hello');
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     // const encoding = new Tiktoken(

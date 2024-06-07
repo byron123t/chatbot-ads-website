@@ -103,20 +103,29 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
   };
 
   const handleLinkClickEvent = async (event: React.MouseEvent<HTMLAnchorElement>) => {
-    console.log(`'${OPENAI_API_HOST}/linkclick`);
     const linkElement = event.currentTarget;
+    const endpoint = 'api/linkclick';
     const apiKey = localStorage.getItem('apiKey');
     const conversationId = localStorage.getItem('selectedConversation');
     if (!apiKey || !conversationId) {
       console.error('API key is missing');
       return;
     }
-    try {
-      const data = await handleLinkClick(apiKey, conversationId, linkElement.href);
-      console.log('LinkClick data:', data);
-    } catch (error) {
-      console.error('Error in linkclick:', error);
-    }
+    let body;
+    body = JSON.stringify({
+      message: linkElement.href,
+      key: apiKey,
+      conversation_id: conversationId,
+    });
+    const controller = new AbortController();
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body,
+    });
   }
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -139,19 +148,28 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
 
 
   const disclosurePopup = async () => {
-    console.log(`${OPENAI_API_HOST}/disclosure`);
+    const endpoint = 'api/disclosure';
     const apiKey = localStorage.getItem('apiKey');
     const conversationId = localStorage.getItem('selectedConversation');
     if (!apiKey || !conversationId) {
       console.error('API key is missing');
       return;
     }
-    try {
-      const data = await handleDisclosure(apiKey, conversationId, 'Disclosure dialog opened', 'disclosuretracking');
-      console.log('Disclosure data:', data);
-    } catch (error) {
-      console.error('Error in disclosure:', error);
-    }
+    let body;
+    body = JSON.stringify({
+      key: apiKey,
+      conversation_id: conversationId,
+      mode: 'disclosuretracking'
+    });
+    const controller = new AbortController();
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body,
+    });
     setIsDisclosureDialog(true);
   };
 
