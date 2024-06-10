@@ -9,12 +9,42 @@ interface Props {
   onClose: () => void;
 }
 
+const RenderJSON = ({ data }: { data: any }) => {
+  if (typeof data === 'object' && data !== null) {
+    if (Array.isArray(data)) {
+      return (
+        <ul>
+          {data.map((item, index) => (
+            <li key={index}>
+              <RenderJSON data={item} />
+            </li>
+          ))}
+        </ul>
+      );
+    } else {
+      return (
+        <div style={{ marginLeft: '20px' }}>
+          {Object.keys(data).map((key) => (
+            <div key={key}>
+              <strong>{key}:</strong>
+              <RenderJSON data={data[key]} />
+            </div>
+          ))}
+        </div>
+      );
+    }
+  } else {
+    return <span>{String(data)}</span>;
+  }
+};
+
 export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('close');
   const { dispatch: homeDispatch } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [products, setProducts] = useState({});
+  const [profile, setProfile] = useState({});
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -92,9 +122,50 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
           }
           const products = JSON.parse(receivedText);
           setProducts(products);
+
+          body = JSON.stringify({
+            key: apiKey,
+            conversation_id: conversationId,
+            mode: 'profile'
+          });
+          const newcontroller = new AbortController();
+          const newresponse = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: newcontroller.signal,
+            body,
+          });
+          if (!newresponse.ok) {
+            console.error('Error fetching profile:', newresponse.statusText);
+            return;
+          }
+          const newdata = newresponse.body;
+          if (!newdata) {
+            console.error('Error fetching profile: No data');
+            return;
+          }
+          const newreader = newdata.getReader();
+          const newdecoder = new TextDecoder();
+          
+          done = false;
+          receivedText = '';
+          
+          while (!done) {
+            const { value, done: streamDone } = await newreader.read();
+            done = streamDone;
+            if (value) {
+              receivedText += newdecoder.decode(value, { stream: true });
+            }
+          }
+          const profiles = JSON.parse(receivedText);
+          setProfile(profiles);
         } catch (error) {
-          console.error('Error fetching products:', error);
+          console.error('Error fetching profile:', error);
         }
+
+
       };
 
       fetchProducts();
@@ -129,18 +200,18 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
             </div>
 
             <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
-              We have prompted this chatbot to advertise content to you in one of two ways:
+              This chatbot is prompted to advertise content to you:
+            </div>
+
+            <div className="text-gray-700 dark:text-gray-300">
+              To subtly and smoothly mention the product/brand in a positive light when the timing or topic is relevant, and to personalize its response to the user when promoting the product/brand.
             </div>
 
             <br />
 
-            <div className="text-gray-700 dark:text-gray-300">
-              To subtly and smoothly mention the product/brand in a positive light when the timing or topic is relevant, and try to use anecdotes and stories when promoting the product/brand.
-
-              <br />
-              <br />
-
-              To act like a real person with a life, friends, family, personality, interests, experiences, beliefs, and values, and to subtly and smoothly mention the following product/brand in a positive light when the timing or topic is relevant.
+            <div className="mb-4">
+              <div className="text-black dark:text-neutral-200 font-bold">User Generated Profile:</div>
+              <div className="text-xs text-gray-700 dark:text-neutral-300"><RenderJSON data={profile} /></div>
             </div>
 
             <button
