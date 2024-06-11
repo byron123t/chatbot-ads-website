@@ -38,6 +38,24 @@ const RenderJSON = ({ data }: { data: any }) => {
   }
 };
 
+const ProductList = ({ products }: {products: any}) => {
+  return (
+      <div>
+          {products.length > 0 ? (
+              products.map((product: any, index: any) => (
+                <ul className="list-disc pl-5">
+                  <li key={index} className="text-xs text-gray-700 dark:text-gray-300">
+                    {product}
+                  </li>
+                </ul>
+              ))
+          ) : (
+              <div className="text-gray-700 dark:text-gray-300">No products available</div>
+          )}
+      </div>
+  );
+};
+
 export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('close');
   const { dispatch: homeDispatch } = useContext(HomeContext);
@@ -121,6 +139,7 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
             }
           }
           const products = JSON.parse(receivedText);
+          console.log(products);
           setProducts(products);
 
           body = JSON.stringify({
@@ -194,8 +213,8 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
 
             <div className="mt-4">
               <div className="mb-4">
-                <div className="text-black dark:text-neutral-200 font-bold">Lastest Product Advertised:</div>
-                <div className="text-black dark:text-neutral-200">{(products as { name?: string }).name || "Unknown Product"}</div>
+                <div className="text-black dark:text-neutral-200 font-bold">Products Advertised:</div>
+                <div className="text-black dark:text-neutral-200"><ProductList products={products}></ProductList></div>
               </div>
             </div>
 
