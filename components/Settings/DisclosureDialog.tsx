@@ -41,17 +41,17 @@ const RenderJSON = ({ data }: { data: any }) => {
 const ProductList = ({ products }: {products: any}) => {
   return (
       <div>
+        <ul className="list-disc pl-5">
           {products.length > 0 ? (
               products.map((product: any, index: any) => (
-                <ul className="list-disc pl-5">
-                  <li key={index} className="text-xs text-gray-700 dark:text-gray-300">
+                  <li key={index} className="text-xs text-black dark:text-neutral-200">
                     {product}
                   </li>
-                </ul>
               ))
           ) : (
-              <div className="text-gray-700 dark:text-gray-300">No products available</div>
+              <div className="text-black dark:text-neutral-200">No products available</div>
           )}
+        </ul>
       </div>
   );
 };
