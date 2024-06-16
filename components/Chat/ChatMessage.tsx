@@ -138,7 +138,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
   const copyOnClick = () => {
     if (!navigator.clipboard) return;
 
-    navigator.clipboard.writeText(message.content).then(() => {
+    navigator.clipboard.writeText(messageNoAds).then(() => {
       setMessageCopied(true);
       setTimeout(() => {
         setMessageCopied(false);
@@ -187,6 +187,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
 
   const containsAd = message.content.includes("$^^ad^^$");
   const containsDisclosure = message.content.includes("$^^disclosure^^$");
+  const messageNoAds = message.content.replace(/\$\^\^ad\^\^\$/g, '').replace(/\$\^\^disclosure\^\^\$/g, '');
 
   return (
     <div

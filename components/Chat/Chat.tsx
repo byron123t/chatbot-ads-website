@@ -8,6 +8,19 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import {
+  IconMail,
+  IconWeight,
+  IconBook,
+  IconSourceCode,
+  IconRobot,
+  IconPlaneDeparture,
+  IconSchool,
+  IconBulb,
+  IconPencil,
+} from '@tabler/icons-react';
+
 import toast from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
@@ -63,10 +76,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
+  const [shuffledButtons, setShuffledButtons] = useState<{ text: string, icon: React.ReactNode, onClick: () => void }[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const hasShuffled = useRef(false);
+
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -350,6 +366,124 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     };
   }, [messagesEndRef]);
 
+  const handleSendSuggested = (contentstring: string) => {
+    if (messageIsStreaming) {
+      return;
+    }
+
+    setCurrentMessage({ role: 'user', content: contentstring });
+    handleSend({ role: 'user', content: contentstring }, 0);
+
+    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
+      textareaRef.current.blur();
+    }
+  };
+
+  const buttonData = [
+    {
+      text: "Experience Seoul like a local",
+      icon: <IconPlaneDeparture className='mb-2' size={20} style={{color: 'Gold'}} />,
+      onClick: () => handleSendSuggested("I am planning a 4-day trip to Seoul. Can you suggest an itinerary that does not involve popular tourist attractions?")
+    },
+    {
+      text: "Explain superconductors",
+      icon: <IconSchool className='mb-2' size={20} style={{color: 'DeepSkyBlue'}} />,
+      onClick: () => handleSendSuggested('Explain superconductors in depth with great detail.')
+    },
+    {
+      text: "Email for plumber quote",
+      icon: <IconMail className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
+      onClick: () => handleSendSuggested('Write an email to request a quote from local plumbers for backflow testing. I need it done in the next 2 weeks. Keep it short and casual.')
+    },
+    {
+      text: "Generate a superhero shark story",
+      icon: <IconBook className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
+      onClick: () => handleSendSuggested('Make up a 5-sentence story about "Sharky", a tooth-brushing shark superhero. Make each sentence a bullet point.')
+    },
+    {
+      text: "Text inviting neighbors to barbecue",
+      icon: <IconPencil className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
+      onClick: () => handleSendSuggested('Write a short-and-sweet text message inviting my neighbor to a barbecue')
+    },
+    {
+      text: "Create a workout plan",
+      icon: <IconWeight className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
+      onClick: () => handleSendSuggested('I need to start resistance training. Can you create a 7-day workout plan for me to ease into it?')
+    },
+    {
+      text: "Quiz me on ancient civilizations",
+      icon: <IconSchool className='mb-2' size={20} style={{color: 'DeepSkyBlue'}} />,
+      onClick: () => handleSendSuggested("Can you test my knowledge on ancient civilizations by asking me specific questions? Start by asking me which civilization I am most interested in and why.")
+    },
+    {
+      text: "Create personal webpage for me",
+      icon: <IconSourceCode className='mb-2' size={20} style={{color: 'Crimson'}} />,
+      onClick: () => handleSendSuggested('Create a personal webpage for me, all in a single file. Ask me 3 questions first on whatever you need to know.')
+    },
+    {
+      text: "Python script for daily email reports",
+      icon: <IconSourceCode className='mb-2' size={20} style={{color: 'Crimson'}} />,
+      onClick: () => handleSendSuggested('Write a script to automate sending daily email reports in Python, and walk me through how I would set it up.')
+    },
+    {
+      text: "Recipe with what's in my kitchen",
+      icon: <IconBulb className='mb-2' size={20} style={{color: 'Gold'}} />,
+      onClick: () => handleSendSuggested('Could you ask me to list five ingredients from my pantry, and then help me invent a new recipe using them?')
+    },
+  ];
+
+  function shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function ButtonComponent({ icon, text, onClick }: { icon: React.ReactNode, text: string, onClick: () => void }) {
+    return (
+      <button
+        className="rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white w-[20%] text-left"
+        onClick={onClick}
+        style={{
+          minHeight: '8em',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+          textAlign: 'left',
+          wordWrap: 'break-word'
+        }}
+      >
+        {icon} {text}
+      </button>
+    );
+  }
+  
+  function ButtonContainer() {
+
+    useEffect(() => {
+      if (selectedConversation?.messages.length === 0 && !hasShuffled.current) {
+        const shuffled = shuffleArray([...buttonData]);
+        setShuffledButtons(shuffled.slice(0, 4));
+        hasShuffled.current = true;
+      }
+    }, []);
+
+    return (
+        <div className="mb-4 top-0 left-0 right-0 mx-auto mb-3 w-fit gap-3 flex items-center justify-center">
+        {shuffledButtons.map((button, index) => (
+          <ButtonComponent
+            key={index}
+            icon={button.icon}
+            text={button.text}
+            onClick={button.onClick}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
       {!(apiKey || serverSideApiKeyIsSet) ? (
@@ -359,16 +493,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
           <div className="text-center text-lg text-black dark:text-white">
             <div className="mb-2 font-bold">
-              Important: Chatbot XYZ is an experimental chatbot
+              Important: Please input the key you received from your survey.
             </div>
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
-              Please input the key you received from your survey.
-            </div>
-            <div className="mb-2">
               {t(
-                'Please set your survey key in the bottom left of the sidebar. Do not edit or change this key after inputting.',
+                'Set your key in the bottom left sidebar. Do not edit or change this key after setting it.',
               )}
             </div>
           </div>
@@ -384,24 +515,35 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-                  <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                <div className="mb-8 mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
+                  <div className="mb-4 text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'Chatbot XYZ'
+                      <div className="mb-4">
+                        Chatbot XYZ
+                      </div>
                     )}
 
                       <div className="text-center text-lg text-black dark:text-white">
-                        <div className="mb-2 font-bold">
+                        <div className="mb-4 font-bold">
                           Important: Chatbot XYZ is an experimental chatbot. It does not support image generation, attaching images, or attaching audio.
                         </div>
                       </div>
                   </div>
                 </div>
 
+      
+                <div className="mb-4 text-center items-center border-black/10 text-gray-800 dark:border-gray-900/50 dark:text-gray-100">
+                  <div className="m-auto flex w-fit items-center gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+                    <div className="min-w-[40px]">
+                      <IconRobot size={80} />
+                    </div>
+                  </div>
+                </div>
+                <ButtonContainer />
               </>
             ) : (
               <>

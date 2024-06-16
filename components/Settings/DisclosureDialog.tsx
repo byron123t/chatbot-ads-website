@@ -2,11 +2,18 @@ import { FC, useContext, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import HomeContext from '@/pages/api/home/home.context';
 import { handleDisclosure } from '@/utils/server';
+import { IconX } from '@tabler/icons-react';
 
 
 interface Props {
   open: boolean;
   onClose: () => void;
+}
+
+function capitalizeWordsAdvanced(str: string): string {
+  return str.replace(/\b\w+/g, word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  );
 }
 
 const RenderJSON = ({ data }: { data: any }) => {
@@ -26,7 +33,7 @@ const RenderJSON = ({ data }: { data: any }) => {
         <div style={{ marginLeft: '20px' }}>
           {Object.keys(data).map((key) => (
             <div key={key}>
-              <strong>{key}:</strong>
+              <strong>{capitalizeWordsAdvanced(key)}: </strong>
               <RenderJSON data={data[key]} />
             </div>
           ))}
@@ -207,29 +214,39 @@ export const DisclosureDialog: FC<Props> = ({ open, onClose }) => {
             className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
-            <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
-              {t('Advertising Disclosure')}
+            <button
+              className="absolute top-0 right-0 mt-2 mr-2 text-red-500 hover:text-red-700"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <IconX size={32} />
+            </button>
+
+            <div className="text-lg pb-2 font-bold text-black dark:text-neutral-200">
+              {t('About This Advertisement')}
+            </div>
+            <div className="mb-4 text-black dark:text-neutral-200">
+              The response you received includes advertising.
             </div>
 
-            <div className="mt-4">
-              <div className="mb-4">
-                <div className="text-black dark:text-neutral-200 font-bold">Products Advertised:</div>
-                <div className="text-black dark:text-neutral-200"><ProductList products={products}></ProductList></div>
-              </div>
+            <div className="mb-4">
+              <div className="text-black dark:text-neutral-200 font-bold">Products Advertised During This Chat Session:</div>
+              <div className="text-black dark:text-neutral-200"><ProductList products={products}></ProductList></div>
             </div>
 
             <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
-              This chatbot is prompted to advertise content to you:
+              This chatbot is instructed to sometimes advertise content to you in the following way:
             </div>
 
             <div className="text-gray-700 dark:text-gray-300">
-              To subtly and smoothly mention the product/brand in a positive light when the timing or topic is relevant, and to personalize its response to the user when promoting the product/brand.
+              To mention the product/brand in a positive light when the timing or topic is relevant, and to personalize its response to the user when promoting the product/brand.
             </div>
 
             <br />
 
             <div className="mb-4">
-              <div className="text-black dark:text-neutral-200 font-bold">User Generated Profile:</div>
+              <div className="mb-2 text-black dark:text-neutral-200 font-bold">Your Generated Profile:</div>
+              <div className="mb-4 text-sm text-black dark:text-neutral-200">This chatbot learns from your questions/prompts, and it tries to guess your demographics, interests, and personality. These may not be accurate but will improve the more you use the chatbot.</div>
               <div className="text-xs text-gray-700 dark:text-neutral-300"><RenderJSON data={profile} /></div>
             </div>
 
