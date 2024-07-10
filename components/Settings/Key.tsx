@@ -3,7 +3,7 @@ import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { SidebarButton } from '../Sidebar/SidebarButton';
+import { KeyButton } from '../Sidebar/KeyButton';
 
 interface Props {
   apiKey: string;
@@ -22,6 +22,15 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
       handleUpdateKey(newKey);
     }
   };
+
+  const classNameAssignment = () => {
+    if (newKey.length > 0) {
+      return "flex w-full cursor-pointer select-none items-center gap-3 rounded-md py-5 px-5 text-[16px] leading-3 text-white transition-colors duration-200 hover:bg-gray-500/10";
+    } else {
+      return "flex w-full cursor-pointer select-none items-center gap-3 rounded-md py-5 px-5 text-[16px] leading-3 text-white transition-colors duration-200 hover:bg-amber-600 bg-amber-700";
+    }
+  }
+  
 
   const handleUpdateKey = (newKey: string) => {
     onApiKeyChange(newKey.trim());
@@ -69,9 +78,10 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
       </div>
     </div>
   ) : (
-    <SidebarButton
+    <KeyButton
       text={t('Survey key')}
       icon={<IconKey size={24} />}
+      classname={classNameAssignment()}
       onClick={() => setIsChanging(true)}
     />
   );
