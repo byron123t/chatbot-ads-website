@@ -76,7 +76,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
-  const [shuffledButtons, setShuffledButtons] = useState<{ text: string, icon: React.ReactNode, onClick: () => void }[]>([]);
+  const [shuffledButtons, setShuffledButtons] = useState<{ text: string, icon: React.ReactNode, detailedtext: string }[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -132,8 +132,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
           });
         }
-        console.log(endpoint);
-        console.log(body);
         const controller = new AbortController();
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -326,14 +324,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   };
   const throttledScrollDown = throttle(scrollDown, 250);
 
-  // useEffect(() => {
-  //   console.log('currentMessage', currentMessage);
-  //   if (currentMessage) {
-  //     handleSend(currentMessage);
-  //     homeDispatch({ field: 'currentMessage', value: undefined });
-  //   }
-  // }, [currentMessage]);
-
   useEffect(() => {
     throttledScrollDown();
     selectedConversation &&
@@ -383,52 +373,52 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     {
       text: "Experience Seoul like a local",
       icon: <IconPlaneDeparture className='mb-2' size={20} style={{color: 'Gold'}} />,
-      onClick: () => handleSendSuggested("I am planning a 4-day trip to Seoul. Can you suggest an itinerary that does not involve popular tourist attractions?")
+      detailedtext: "I am planning a 4-day trip to Seoul. Can you suggest an itinerary that does not involve popular tourist attractions?"
     },
     {
       text: "Explain superconductors",
       icon: <IconSchool className='mb-2' size={20} style={{color: 'DeepSkyBlue'}} />,
-      onClick: () => handleSendSuggested('Explain superconductors in depth with great detail.')
+      detailedtext: 'Explain superconductors in depth with great detail.'
     },
     {
       text: "Email for plumber quote",
       icon: <IconMail className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
-      onClick: () => handleSendSuggested('Write an email to request a quote from local plumbers for backflow testing. I need it done in the next 2 weeks. Keep it short and casual.')
+      detailedtext: 'Write an email to request a quote from local plumbers for backflow testing. I need it done in the next 2 weeks. Keep it short and casual.'
     },
     {
       text: "Generate a superhero shark story",
       icon: <IconBook className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
-      onClick: () => handleSendSuggested('Make up a 5-sentence story about "Sharky", a tooth-brushing shark superhero. Make each sentence a bullet point.')
+      detailedtext: 'Make up a 5-sentence story about "Sharky", a tooth-brushing shark superhero. Make each sentence a bullet point.'
     },
     {
       text: "Text inviting neighbors to barbecue",
       icon: <IconPencil className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
-      onClick: () => handleSendSuggested('Write a short-and-sweet text message inviting my neighbor to a barbecue')
+      detailedtext: 'Write a short-and-sweet text message inviting my neighbor to a barbecue'
     },
     {
       text: "Create a workout plan",
       icon: <IconWeight className='mb-2' size={20} style={{color: 'BlueViolet'}} />,
-      onClick: () => handleSendSuggested('I need to start resistance training. Can you create a 7-day workout plan for me to ease into it?')
+      detailedtext: 'I need to start resistance training. Can you create a 7-day workout plan for me to ease into it?'
     },
     {
       text: "Quiz me on ancient civilizations",
       icon: <IconSchool className='mb-2' size={20} style={{color: 'DeepSkyBlue'}} />,
-      onClick: () => handleSendSuggested("Can you test my knowledge on ancient civilizations by asking me specific questions? Start by asking me which civilization I am most interested in and why.")
+      detailedtext: "Can you test my knowledge on ancient civilizations by asking me specific questions? Start by asking me which civilization I am most interested in and why."
     },
     {
       text: "Create personal webpage for me",
       icon: <IconSourceCode className='mb-2' size={20} style={{color: 'Crimson'}} />,
-      onClick: () => handleSendSuggested('Create a personal webpage for me, all in a single file. Ask me 3 questions first on whatever you need to know.')
+      detailedtext: 'Create a personal webpage for me, all in a single file. Ask me 3 questions first on whatever you need to know.'
     },
     {
       text: "Python script for daily email reports",
       icon: <IconSourceCode className='mb-2' size={20} style={{color: 'Crimson'}} />,
-      onClick: () => handleSendSuggested('Write a script to automate sending daily email reports in Python, and walk me through how I would set it up.')
+      detailedtext: 'Write a script to automate sending daily email reports in Python, and walk me through how I would set it up.'
     },
     {
       text: "Recipe with what's in my kitchen",
       icon: <IconBulb className='mb-2' size={20} style={{color: 'Gold'}} />,
-      onClick: () => handleSendSuggested('Could you ask me to list five ingredients from my pantry, and then help me invent a new recipe using them?')
+      detailedtext: 'Could you ask me to list five ingredients from my pantry, and then help me invent a new recipe using them?'
     },
   ];
 
@@ -477,7 +467,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             key={index}
             icon={button.icon}
             text={button.text}
-            onClick={button.onClick}
+            onClick={() => handleSendSuggested(button.detailedtext)}
           />
         ))}
       </div>
