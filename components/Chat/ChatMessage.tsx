@@ -354,7 +354,12 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
               </div>
             </div>
           )}
-          {containsAd && containsDisclosure && message.role === 'assistant' && (
+          {messageIsStreaming && containsAd && containsDisclosure && message.role === 'assistant' && (
+            <div style={{ fontSize: '0.75rem', textAlign: 'right', width: '100%' }}>
+              Sponsored
+            </div>
+          )}
+          {!messageIsStreaming && containsAd && containsDisclosure && message.role === 'assistant' && (
             <div style={{ fontSize: '0.75rem', textAlign: 'right', width: '100%' }}>
               <button
               className="underline text-blue-400 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-200"
