@@ -39,6 +39,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(response.status);
 
+    if (response.status === 429) {
+      return new Response('Rate limit reached', { status: 429 });
+    }
+
     if (response.status === 401) {
       return new Response(response.body, {
         status: 500,

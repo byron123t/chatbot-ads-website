@@ -144,7 +144,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          toast.error(t('Error. Either your key is incorrect, you reached the rate limit, or the server backend is having issues.') + `: ${response.statusText}`);
+          console.error(response);
           return;
         }
         const data = response.body;
@@ -479,17 +480,17 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
           <div className="text-center text-4xl font-bold text-black dark:text-white">
-            Welcome to Chatbot XYZ
+            Welcome to Chatbot Ads
           </div>
           <div className="text-center text-lg text-black dark:text-white">
             <div className="mb-2 font-bold">
-              Important: Please input the key you received from your survey.
+              Important: Please input the key from the paper (page 3 footnote).
             </div>
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
               {t(
-                'Set your key in the bottom left sidebar. Do not edit or change this key after setting it.',
+                'Set your key in the bottom left sidebar, and click the checkmark or press enter.',
               )}
             </div>
           </div>
@@ -505,31 +506,42 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mb-8 mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-                  <div className="mb-4 text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                <div className="mb-4 mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
+                  <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
                       <div className="mb-4">
-                        Chatbot XYZ
+                        Chatbot Ads
                       </div>
                     )}
 
-                      <div className="text-center text-lg text-black dark:text-white">
-                        <div className="mb-4 font-bold">
-                          Important: Chatbot XYZ is an experimental chatbot. It does not support image generation, attaching images, or attaching audio.
+                      <div className="text-center text-sm text-black dark:text-white">
+                        <div className="font-bold">
+                          <div className="text-center text-lg text-black dark:text-white">
+                            Important: Chatbot Ads is a research demo for <a className="underline text-blue-400 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-200" href="https://www.bjaytang.com/projects/post_010/" target="_blank" rel="noreferrer">this paper</a>.<br/>
+                          </div>
+                          Several things are altered from when we conducted the study.<br/><br/>
+                          This chatbot does not support image generation, attaching images, attaching audio, or displaying chain of thought. It supports markdown and code blocks.<br/><br/>
+                          User profiles generated from your conversation history are stored per session.<br/>
+                          To reset the history, remove the generated UUID appended to your paper key.<br/>
+                          Each device is rate limited to 20 queries per day. Please do not abuse our demo or hog our cloud credits so that others can experiment with it.<br/><br/>
+                          The current demo uses a slightly altered prompt and o4-mini.<br/>
+                          The topic classification, user profiling, and ad assignment all use gpt-4o.<br/><br/>
+                          Do not enter any sensitive personal information.<br/>
+                          Please give the chatbot 5-10 seconds to respond.
                         </div>
                       </div>
                   </div>
                 </div>
 
       
-                <div className="mb-4 text-center items-center border-black/10 text-gray-800 dark:border-gray-900/50 dark:text-gray-100">
-                  <div className="m-auto flex w-fit items-center gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+                <div className="text-center items-center border-black/10 text-gray-800 dark:border-gray-900/50 dark:text-gray-100">
+                  <div className="m-auto flex w-fit items-center p-4 mb-4 gap-4 text-base md:max-w-2xl lg:max-w-2xl lg:px-0 xl:max-w-3xl">
                     <div className="min-w-[40px]">
-                      <IconRobot size={80} />
+                      <IconRobot size={60} />
                     </div>
                   </div>
                 </div>

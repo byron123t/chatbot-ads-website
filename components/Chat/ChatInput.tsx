@@ -33,6 +33,8 @@ import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
+import PrivacyPolicyModal from './PrivacyPolicy';
+
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
@@ -67,6 +69,7 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -334,7 +337,7 @@ export const ChatInput = ({
               }`,
             }}
             placeholder={
-              t('Type a message or type "/" to select a prompt...') || ''
+              t('Type a message...') || ''
             }
             value={content}
             rows={1}
@@ -389,16 +392,19 @@ export const ChatInput = ({
         </div>
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
-        <a
-          className="underline"
+        <span className="mr-2">
+          {t('Chatbot Ads is an advertising chatbot.')}
+        </span>
+        <button
+          type="button"
+          onClick={() => setShowPrivacy(true)}
+          className="ml-2 underline hover:text-black dark:hover:text-white"
         >
-          ChatBot XYZ
-        </a>
-        .{' '}
-        {t(
-          "Chatbot XYZ is an advanced chatbot.",
-        )}
+          {t('Privacy Policy')}
+        </button>
+        <PrivacyPolicyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} />
       </div>
+
     </div>
   );
 };

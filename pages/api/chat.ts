@@ -58,7 +58,14 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(stream, { headers: { 'Content-Type': 'text/event-stream; charset=utf-8' } });
   } catch (error) {
     console.error(error);
+    if (error instanceof Response) {
+      console.error(error.status);
+      if (error.status === 429) {
+        return new Response('Rate limit reached', { status: 429 });
+      }
+    }
     if (error instanceof OpenAIError) {
+      console.error(error.message);
       return new Response('Error', { status: 500, statusText: error.message });
     } else {
       return new Response('Error', { status: 500 });

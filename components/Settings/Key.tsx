@@ -1,5 +1,6 @@
 import { IconCheck, IconKey, IconX } from '@tabler/icons-react';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid'; // ✅ add uuid import
 
 import { useTranslation } from 'next-i18next';
 
@@ -16,6 +17,9 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
   const [newKey, setNewKey] = useState(apiKey);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // ✅ generate UUID once and keep it stable for this component instance
+  const uuidRef = useRef<string>(uuidv4());
+
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -30,10 +34,14 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
       return "flex w-full cursor-pointer select-none items-center gap-3 rounded-md py-5 px-5 text-[16px] leading-3 text-white transition-colors duration-200 hover:bg-amber-600 bg-amber-700";
     }
   }
-  
 
-  const handleUpdateKey = (newKey: string) => {
-    onApiKeyChange(newKey.trim());
+  const handleUpdateKey = (key: string) => {
+    const trimmed = key.trim();
+    // ✅ append UUID to the key (suffix). If you prefer prefixing, swap the order.
+    if (trimmed.length < 15) {
+      const keyedWithUuid = trimmed.length > 0 ? `${trimmed}-${uuidRef.current}` : trimmed;
+      onApiKeyChange(keyedWithUuid);
+    }
     setIsChanging(false);
   };
 
@@ -79,7 +87,7 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
     </div>
   ) : (
     <KeyButton
-      text={t('Survey key')}
+      text={t('Paper key')}
       icon={<IconKey size={24} />}
       classname={classNameAssignment()}
       onClick={() => setIsChanging(true)}
